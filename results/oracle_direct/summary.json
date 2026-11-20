@@ -1,0 +1,209 @@
+{
+  "n_episodes": 15,
+  "success_rate": 1.0,
+  "success_by_category": {
+    "motion": 1.0,
+    "multi-step": 1.0,
+    "pick-place": 1.0,
+    "robustness": 1.0,
+    "spatial": 1.0
+  },
+  "claim_calibration": 1.0,
+  "latency_s": {
+    "episode_total": {
+      "mean": 0.2376941705326317,
+      "p50": 0.22599119899678044,
+      "p90": 0.5640944232029141,
+      "max": 0.6923273159918608
+    },
+    "episode_llm": {
+      "mean": 0.0,
+      "p50": 0.0,
+      "p90": 0.0,
+      "max": 0.0
+    },
+    "episode_tool_exec": {
+      "mean": 0.2376135257334681,
+      "p50": 0.22589110101398546,
+      "p90": 0.5640031894145068,
+      "max": 0.6922288649802795
+    },
+    "time_to_first_action": {
+      "mean": 0.0,
+      "p50": 0.0,
+      "p90": 0.0,
+      "max": 0.0
+    },
+    "per_llm_call": {
+      "mean": NaN,
+      "p50": NaN,
+      "p90": NaN,
+      "max": NaN
+    },
+    "motion_exec_per_episode": {
+      "mean": 12.18239999999908,
+      "p50": 11.396000000000576,
+      "p90": 30.398799999994697,
+      "max": 34.675999999996776
+    },
+    "realtime_projected": {
+      "mean": 12.189471744987285,
+      "p50": 11.403607830994524,
+      "p90": 30.415721169162897,
+      "max": 34.696124573970366
+    }
+  },
+  "mean_llm_calls": 0.0,
+  "mean_tool_calls": 3.4,
+  "tool_error_rate": 0.0,
+  "tokens": {
+    "input_mean": 0.0,
+    "output_mean": 0.0,
+    "cache_read_mean": 0.0
+  },
+  "per_task": {
+    "T01_home": {
+      "category": "motion",
+      "instruction": "Move the arm back to its home position.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.020144062000326812,
+      "mean_llm_calls": 0.0
+    },
+    "T02_raise": {
+      "category": "motion",
+      "instruction": "Raise the gripper by 10 centimetres.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.02692426199791953,
+      "mean_llm_calls": 0.0
+    },
+    "T03_hover": {
+      "category": "motion",
+      "instruction": "Hover the gripper about 10 cm above the red cube.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.0343091690010624,
+      "mean_llm_calls": 0.0
+    },
+    "T04_pick": {
+      "category": "pick-place",
+      "instruction": "Pick up the red cube.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.12135268699785229,
+      "mean_llm_calls": 0.0
+    },
+    "T05_to_zone": {
+      "category": "pick-place",
+      "instruction": "Put the blue cube on the right pad.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.260970217990689,
+      "mean_llm_calls": 0.0
+    },
+    "T06_stack": {
+      "category": "pick-place",
+      "instruction": "Stack the red cube on top of the green cube.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.23302040400449187,
+      "mean_llm_calls": 0.0
+    },
+    "T07_relative": {
+      "category": "spatial",
+      "instruction": "Place the yellow cube 10 cm to the left of the blue cube.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.22599119899678044,
+      "mean_llm_calls": 0.0
+    },
+    "T08_closest": {
+      "category": "spatial",
+      "instruction": "Put the cube that is closest to the robot onto the left pad.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.24306755300494842,
+      "mean_llm_calls": 0.0
+    },
+    "T09_sort": {
+      "category": "multi-step",
+      "instruction": "Put the red cube on the left pad and the blue cube on the right pad.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.45670505000452977,
+      "mean_llm_calls": 0.0
+    },
+    "T10_tower": {
+      "category": "multi-step",
+      "instruction": "Build a tower on the left pad: blue cube at the bottom, then the green cube, then the red cube on top.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.6923273159918608,
+      "mean_llm_calls": 0.0
+    },
+    "T11_swap": {
+      "category": "multi-step",
+      "instruction": "Swap the positions of the red cube and the green cube.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.6012820000032661,
+      "mean_llm_calls": 0.0
+    },
+    "T12_clear_zone": {
+      "category": "multi-step",
+      "instruction": "Clear the left pad by moving everything on it onto the right pad. Stacking is fine.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.5083130580023862,
+      "mean_llm_calls": 0.0
+    },
+    "T13_lift_hold": {
+      "category": "pick-place",
+      "instruction": "Lift the green cube to about 20 cm above the table and keep holding it.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.14069423999171704,
+      "mean_llm_calls": 0.0
+    },
+    "T14_missing_object": {
+      "category": "robustness",
+      "instruction": "Pick up the purple cube.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.00014143700536806136,
+      "mean_llm_calls": 0.0
+    },
+    "T15_unreachable": {
+      "category": "robustness",
+      "instruction": "Put the red cube at x = 1.5 m, y = 0.",
+      "runs": 1,
+      "successes": 1,
+      "success_rate": 1.0,
+      "mean_total_s": 0.0001699029962765053,
+      "mean_llm_calls": 0.0
+    }
+  },
+  "meta": {
+    "created": "2026-11-20T16:31:52+00:00",
+    "backend": "direct",
+    "planner": "oracle",
+    "model": "scripted",
+    "trials": 1,
+    "n_tasks": 15
+  }
+}

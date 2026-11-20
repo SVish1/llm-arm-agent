@@ -1,0 +1,144 @@
+<!--
+  Franka Panda on a tabletop with four cubes and two target pads.
+
+  Kinematics (joint origins, axes, limits, hand/TCP offsets) follow the
+  panda URDF shipped in moveit_resources_panda_description, so a joint
+  trajectory planned by MoveIt for `panda_arm` lands the gripper at the
+  same Cartesian pose here. Link geometry is a simplified capsule model
+  (visual only); only the finger pads, table and cubes collide.
+
+  World frame == panda_link0: x forward, y left, z up, table top at z = 0.
+-->
+<mujoco model="panda_tabletop">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.002" integrator="implicitfast" cone="elliptic" impratio="10"/>
+
+  <visual>
+    <global offwidth="1280" offheight="960" azimuth="150" elevation="-25"/>
+    <headlight diffuse="0.7 0.7 0.7" ambient="0.45 0.45 0.45" specular="0.1 0.1 0.1"/>
+  </visual>
+
+  <default>
+    <joint armature="0.1" damping="40"/>
+    <default class="link">
+      <geom type="capsule" contype="0" conaffinity="0" group="1" density="600" rgba="0.92 0.92 0.95 1"/>
+    </default>
+    <default class="dark">
+      <geom type="capsule" contype="0" conaffinity="0" group="1" density="600" rgba="0.2 0.2 0.22 1"/>
+    </default>
+    <default class="pad">
+      <geom type="box" contype="2" conaffinity="1" friction="2 0.05 0.001" condim="4"
+            solref="0.004 1" rgba="0.15 0.15 0.15 1"/>
+    </default>
+    <default class="cube">
+      <geom type="box" size="0.02 0.02 0.02" mass="0.05" contype="1" conaffinity="1"
+            friction="1.5 0.05 0.001" condim="4" solref="0.004 1"/>
+    </default>
+    <default class="zone">
+      <geom type="cylinder" size="0.06 0.0005" contype="0" conaffinity="0" group="2"/>
+    </default>
+  </default>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.25 0.27 0.3" rgb2="0.2 0.22 0.25"
+             width="512" height="512" mark="edge" markrgb="0.35 0.37 0.4"/>
+    <material name="floor" texture="grid" texrepeat="6 6"/>
+    <material name="wood" rgba="0.62 0.5 0.38 1"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0.4 0 2.0" dir="0 0 -1" diffuse="0.7 0.7 0.7"/>
+    <geom name="floor" type="plane" pos="0 0 -0.75" size="3 3 0.1" material="floor"/>
+    <!-- Table top at z=0 spans x in [-0.15, 0.95], y in [-0.6, 0.6] -->
+    <geom name="table" type="box" pos="0.4 0 -0.025" size="0.55 0.6 0.025" material="wood"
+          contype="1" conaffinity="1" friction="1 0.05 0.001"/>
+
+    <!-- Target pads (visual markers lying on the table) -->
+    <geom name="left_pad" class="zone" pos="0.45 0.25 0.0005" rgba="0.3 0.55 0.95 0.6"/>
+    <geom name="right_pad" class="zone" pos="0.45 -0.25 0.0005" rgba="0.95 0.6 0.25 0.6"/>
+
+    <body name="panda_link0" pos="0 0 0">
+      <geom class="link" fromto="0 0 0.03 0 0 0.2" size="0.08"/>
+      <body name="panda_link1" pos="0 0 0.333" gravcomp="1">
+        <joint name="panda_joint1" axis="0 0 1" range="-2.8973 2.8973"/>
+        <geom class="link" fromto="0 0 -0.15 0 0 0" size="0.065"/>
+        <body name="panda_link2" euler="-1.5707963 0 0" gravcomp="1">
+          <joint name="panda_joint2" axis="0 0 1" range="-1.7628 1.7628"/>
+          <geom class="link" fromto="0 0 -0.06 0 0 0.06" size="0.065"/>
+          <body name="panda_link3" pos="0 -0.316 0" euler="1.5707963 0 0" gravcomp="1">
+            <joint name="panda_joint3" axis="0 0 1" range="-2.8973 2.8973"/>
+            <geom class="link" fromto="0 0 -0.26 0 0 0" size="0.06"/>
+            <geom class="dark" fromto="0 0 0 0.0825 0 0" size="0.055"/>
+            <body name="panda_link4" pos="0.0825 0 0" euler="1.5707963 0 0" gravcomp="1">
+              <joint name="panda_joint4" axis="0 0 1" range="-3.0718 -0.0698"/>
+              <geom class="link" fromto="0 0 -0.05 0 0 0.05" size="0.06"/>
+              <geom class="link" fromto="0 0 0 -0.0825 0.1 0" size="0.055"/>
+              <body name="panda_link5" pos="-0.0825 0.384 0" euler="-1.5707963 0 0" gravcomp="1">
+                <joint name="panda_joint5" axis="0 0 1" range="-2.8973 2.8973" damping="15"/>
+                <geom class="link" fromto="0 0 -0.28 0 0 -0.02" size="0.055"/>
+                <body name="panda_link6" euler="1.5707963 0 0" gravcomp="1">
+                  <joint name="panda_joint6" axis="0 0 1" range="-0.0175 3.7525" damping="15"/>
+                  <geom class="dark" fromto="0 0 -0.04 0 0 0.04" size="0.05"/>
+                  <geom class="link" fromto="0 0 0 0.088 0 0" size="0.045"/>
+                  <body name="panda_link7" pos="0.088 0 0" euler="1.5707963 0 0" gravcomp="1">
+                    <joint name="panda_joint7" axis="0 0 1" range="-2.8973 2.8973" damping="10"/>
+                    <geom class="dark" fromto="0 0 -0.03 0 0 0.09" size="0.045"/>
+                    <!-- panda_link8 (flange) is at z=0.107; the hand is rotated -45 deg about z -->
+                    <body name="panda_hand" pos="0 0 0.107" euler="0 0 -0.7853982" gravcomp="1">
+                      <geom type="box" pos="0 0 0.03" size="0.025 0.095 0.028" contype="0" conaffinity="0"
+                            group="1" density="600" rgba="0.92 0.92 0.95 1"/>
+                      <!-- Tool centre point: midpoint between the finger pads -->
+                      <site name="tcp" pos="0 0 0.1034" size="0.006" rgba="1 0.2 0.2 1"/>
+                      <body name="panda_leftfinger" pos="0 0 0.0584" gravcomp="1">
+                        <joint name="panda_finger_joint1" type="slide" axis="0 1 0" range="0 0.04" damping="10" armature="0.01"/>
+                        <geom type="box" pos="0 0.012 0.022" size="0.01 0.008 0.022" contype="0" conaffinity="0"
+                              group="1" density="600" rgba="0.2 0.2 0.22 1"/>
+                        <geom name="left_finger_pad" class="pad" pos="0 0.004 0.045" size="0.009 0.004 0.012"/>
+                      </body>
+                      <body name="panda_rightfinger" pos="0 0 0.0584" gravcomp="1">
+                        <joint name="panda_finger_joint2" type="slide" axis="0 -1 0" range="0 0.04" damping="10" armature="0.01"/>
+                        <geom type="box" pos="0 -0.012 0.022" size="0.01 0.008 0.022" contype="0" conaffinity="0"
+                              group="1" density="600" rgba="0.2 0.2 0.22 1"/>
+                        <geom name="right_finger_pad" class="pad" pos="0 -0.004 0.045" size="0.009 0.004 0.012"/>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- Manipulable objects; initial poses are set per task at reset time -->
+    <body name="red_cube" pos="0.55 0.05 0.02">
+      <freejoint name="red_cube_joint"/>
+      <geom class="cube" rgba="0.85 0.15 0.15 1"/>
+    </body>
+    <body name="green_cube" pos="0.45 -0.05 0.02">
+      <freejoint name="green_cube_joint"/>
+      <geom class="cube" rgba="0.2 0.75 0.25 1"/>
+    </body>
+    <body name="blue_cube" pos="0.6 -0.12 0.02">
+      <freejoint name="blue_cube_joint"/>
+      <geom class="cube" rgba="0.2 0.35 0.9 1"/>
+    </body>
+    <body name="yellow_cube" pos="0.4 0.12 0.02">
+      <freejoint name="yellow_cube_joint"/>
+      <geom class="cube" rgba="0.95 0.85 0.15 1"/>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="act_joint1" joint="panda_joint1" kp="4000" forcerange="-150 150"/>
+    <position name="act_joint2" joint="panda_joint2" kp="4000" forcerange="-150 150"/>
+    <position name="act_joint3" joint="panda_joint3" kp="3500" forcerange="-150 150"/>
+    <position name="act_joint4" joint="panda_joint4" kp="3500" forcerange="-150 150"/>
+    <position name="act_joint5" joint="panda_joint5" kp="2000" forcerange="-50 50"/>
+    <position name="act_joint6" joint="panda_joint6" kp="2000" forcerange="-50 50"/>
+    <position name="act_joint7" joint="panda_joint7" kp="2000" forcerange="-50 50"/>
+    <position name="act_finger1" joint="panda_finger_joint1" kp="800" forcerange="-40 40" ctrlrange="0 0.04"/>
+    <position name="act_finger2" joint="panda_finger_joint2" kp="800" forcerange="-40 40" ctrlrange="0 0.04"/>
+  </actuator>
+</mujoco>
