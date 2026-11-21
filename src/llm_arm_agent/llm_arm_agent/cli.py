@@ -4,6 +4,7 @@
   llm-arm run                                            # interactive prompt
   llm-arm bench --planner llm --trials 3              # benchmark
   llm-arm bench --planner oracle                         # scripted baseline, no API key needed
+  llm-arm compare results/runA results/runB              # diff two benchmark runs
 
 Add --backend moveit to go through ROS 2 / MoveIt 2 (launch sim_moveit.launch.py first).
 """
@@ -107,6 +108,33 @@ def cmd_report(args) -> int:
     return 0
 
 
+def _load_summary(path: str) -> dict:
+    import os
+
+    if os.path.isdir(path):
+        path = os.path.join(path, "summary.json")
+    with open(path) as f:
+        return json.load(f)
+
+
+def cmd_compare(args) -> int:
+    import os
+
+    from .bench.runner import render_comparison
+
+    a, b = _load_summary(args.a), _load_summary(args.b)
+    name_a = os.path.basename(os.path.normpath(args.a)).removesuffix(".json")
+    name_b = os.path.basename(os.path.normpath(args.b)).removesuffix(".json")
+    if name_a == name_b:
+        name_a, name_b = "A", "B"
+    md = render_comparison(a, b, name_a, name_b)
+    print(md, end="")
+    if args.out:
+        with open(args.out, "w") as f:
+            f.write(md)
+    return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="llm-arm", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -133,6 +161,12 @@ def main(argv=None) -> int:
     p = sub.add_parser("report", help="render a summary.json as markdown")
     p.add_argument("summary")
     p.set_defaults(func=cmd_report)
+
+    p = sub.add_parser("compare", help="diff two benchmark runs (run dirs or summary.json files)")
+    p.add_argument("a", help="baseline run")
+    p.add_argument("b", help="run to compare against the baseline")
+    p.add_argument("--out", help="also write the markdown to this file")
+    p.set_defaults(func=cmd_compare)
 
     args = parser.parse_args(argv)
     return args.func(args)

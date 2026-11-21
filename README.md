@@ -51,6 +51,7 @@ llm-arm run "stack the red cube on the green cube" --scene T06_stack --viewer
 llm-arm run                                                   # interactive prompt
 llm-arm bench --planner oracle                                # scripted baseline, no API key needed
 llm-arm bench --planner llm --trials 3                     # the real benchmark
+llm-arm compare results/oracle_direct results/oracle_moveit   # diff two runs
 ```
 
 ## Full ROS 2 Humble + MoveIt 2 stack
@@ -110,7 +111,7 @@ LLM agent (effort `medium`):
 | `direct` | 3 × 15 | _run `llm-arm bench --planner llm --trials 3`_ | | | | |
 | `moveit` | 3 × 15 | _run with `--backend moveit`_ | | | | |
 
-Run directories for the oracle baselines are in [results/](results/). Fill the table from `results/<run>/report.md`. `--effort low|medium|high` gives a quick latency/accuracy sweep.
+Run directories for the oracle baselines are in [results/](results/). Fill the table from `results/<run>/report.md`. `--effort low|medium|high` gives a quick latency/accuracy sweep, and `llm-arm compare <run A> <run B>` diffs two runs: headline metrics with deltas, per-category success, and the tasks that improved or regressed.
 
 ## Design notes
 

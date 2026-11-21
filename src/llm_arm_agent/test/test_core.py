@@ -143,3 +143,18 @@ def test_summary_metrics(backend):
     s = summarize(recs)
     assert s["success_rate"] == 1.0
     assert not math.isnan(s["latency_s"]["episode_total"]["p50"])
+
+
+def test_compare_flags_regressions(backend):
+    from llm_arm_agent.bench.runner import render_comparison
+
+    tasks = TASKS[:3]
+    base = [run_episode(backend, OraclePlanner(t.oracle), t) for t in tasks]
+    worse = [dict(r) for r in base]
+    worse[1]["success"] = False
+    for r in base + worse:
+        r["trial"] = 0
+    md = render_comparison(summarize(base), summarize(worse), "base", "new")
+    assert "regressed" in md and tasks[1].id in md
+    assert "-33.3 pp worse" in md
+    assert "identical" in render_comparison(summarize(base), summarize(base))

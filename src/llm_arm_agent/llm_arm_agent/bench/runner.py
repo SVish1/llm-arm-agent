@@ -188,3 +188,69 @@ def render_markdown(s: Dict) -> str:
         lines.append(f"| {tid} | {t['category']} | {t['instruction']} | {t['successes']}/{t['runs']} | "
                      f"{t['mean_total_s']:.1f} | {t['mean_llm_calls']:.1f} |")
     return "\n".join(lines) + "\n"
+
+
+# ------------------------------------------------------------------ comparison
+def _fmt_delta(a: float, b: float, scale: float = 1.0, unit: str = "", lower_is_better: bool = False) -> str:
+    if a != a or b != b:  # NaN on either side
+        return "n/a"
+    d = (b - a) * scale
+    if abs(d) < 1e-9:
+        return f"0{unit}"
+    better = (d < 0) if lower_is_better else (d > 0)
+    return f"{d:+.1f}{unit} {'better' if better else 'worse'}"
+
+
+def _label(s: Dict, fallback: str) -> str:
+    meta = s.get("meta", {})
+    if not meta:
+        return fallback
+    return f"{meta.get('planner', '?')}/{meta.get('backend', '?')}"
+
+
+def render_comparison(a: Dict, b: Dict, name_a: str = "A", name_b: str = "B") -> str:
+    """Markdown diff of two benchmark summaries (B relative to A)."""
+    la, lb = _label(a, name_a), _label(b, name_b)
+    lines = [f"## Benchmark comparison: {name_a} ({la}) vs {name_b} ({lb})", "",
+             f"| Metric | {name_a} | {name_b} | Δ ({name_b} − {name_a}) |", "|---|---:|---:|---|"]
+
+    def row(label, va, vb, scale=1.0, unit="", fmt="{:.2f}", lower=False):
+        sa = "n/a" if va != va else fmt.format(va * scale)
+        sb = "n/a" if vb != vb else fmt.format(vb * scale)
+        lines.append(f"| {label} | {sa} | {sb} | {_fmt_delta(va, vb, scale, unit, lower)} |")
+
+    row("Success rate", a["success_rate"], b["success_rate"], 100, " pp", "{:.1f}%")
+    row("Self-report calibration", a["claim_calibration"], b["claim_calibration"], 100, " pp", "{:.1f}%")
+    row("Tool error rate", a["tool_error_rate"], b["tool_error_rate"], 100, " pp", "{:.1f}%", lower=True)
+    row("Mean LLM calls / episode", a["mean_llm_calls"], b["mean_llm_calls"], lower=True)
+    row("Mean tool calls / episode", a["mean_tool_calls"], b["mean_tool_calls"], lower=True)
+    for key, label in (("episode_total", "Episode p50 (s)"), ("per_llm_call", "LLM call p50 (s)"),
+                       ("time_to_first_action", "Time to first action p50 (s)"),
+                       ("realtime_projected", "Real-time projected p50 (s)")):
+        va = a["latency_s"].get(key, {}).get("p50", float("nan"))
+        vb = b["latency_s"].get(key, {}).get("p50", float("nan"))
+        row(label, va, vb, lower=True)
+    row("Output tokens / episode", a["tokens"]["output_mean"], b["tokens"]["output_mean"], fmt="{:.0f}", lower=True)
+
+    cats = sorted(set(a["success_by_category"]) | set(b["success_by_category"]))
+    lines += ["", f"| Category | {name_a} | {name_b} |", "|---|---:|---:|"]
+    for c in cats:
+        ca, cb = a["success_by_category"].get(c), b["success_by_category"].get(c)
+        lines.append(f"| {c} | {'-' if ca is None else f'{ca * 100:.0f}%'} | {'-' if cb is None else f'{cb * 100:.0f}%'} |")
+
+    changed = []
+    for tid in sorted(set(a["per_task"]) | set(b["per_task"])):
+        ta, tb = a["per_task"].get(tid), b["per_task"].get(tid)
+        ra = None if ta is None else ta["success_rate"]
+        rb = None if tb is None else tb["success_rate"]
+        if ra != rb:
+            fa = "-" if ta is None else f"{ta['successes']}/{ta['runs']}"
+            fb = "-" if tb is None else f"{tb['successes']}/{tb['runs']}"
+            tag = "only in one run" if ra is None or rb is None else ("improved" if rb > ra else "regressed")
+            changed.append(f"| {tid} | {fa} | {fb} | {tag} |")
+    lines += [""]
+    if changed:
+        lines += [f"| Task with changed success | {name_a} | {name_b} | |", "|---|---:|---:|---|", *changed]
+    else:
+        lines.append("Per-task success is identical in both runs.")
+    return "\n".join(lines) + "\n"
