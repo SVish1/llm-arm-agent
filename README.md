@@ -1,5 +1,11 @@
 # LLM Arm Agent: natural language → ROS 2 / MoveIt 2 → simulated Franka Panda
 
+[![ci](https://github.com/SVish1/llm-arm-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/SVish1/llm-arm-agent/actions/workflows/ci.yml)
+![ROS 2 Humble](https://img.shields.io/badge/ROS%202-Humble-22314E)
+![MoveIt 2](https://img.shields.io/badge/MoveIt-2-blue)
+![MuJoCo](https://img.shields.io/badge/sim-MuJoCo-orange)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 An LLM agent that turns text commands like *"build a tower on the left pad: blue at the bottom, then green, then red"* into collision-aware MoveIt 2 motions on a Franka Panda simulated in MuJoCo, plus a **15-task benchmark** that logs success rate and latency for every episode.
 
 <p align="center"><img src="docs/demo_tower.gif" width="440" alt="Panda arm building a three-cube tower in MuJoCo"></p>
